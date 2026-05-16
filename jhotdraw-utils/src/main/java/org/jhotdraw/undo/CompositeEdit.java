@@ -113,7 +113,8 @@ public class CompositeEdit extends CompoundEdit {
      */
     @Override
     public String getUndoPresentationName() {
-        return ((presentationName != null) ? UndoRedoManager.getLabels().getString("edit.undo.text") + " " + presentationName : super.getUndoPresentationName());
+        String undoLabel = UndoRedoManager.getLabels().getString("edit.undo.text");
+        return undoLabel + " " + presentationName;
     }
 
     /**
@@ -125,7 +126,8 @@ public class CompositeEdit extends CompoundEdit {
      */
     @Override
     public String getRedoPresentationName() {
-        return ((presentationName != null) ? UndoRedoManager.getLabels().getString("edit.redo.text") + " " + presentationName : super.getRedoPresentationName());
+        String redoLabel = UndoRedoManager.getLabels().getString("edit.redo.text");
+        return redoLabel + " " + presentationName;
     }
 
     /**
@@ -161,8 +163,7 @@ public class CompositeEdit extends CompoundEdit {
      */
     @Override
     public boolean isSignificant() {
-        return (isSignificant) ? super.isSignificant() : false;
-        //return isSignificant;
+        return isSignificant && super.isSignificant();
     }
 
     public void setSignificant(boolean newValue) {
