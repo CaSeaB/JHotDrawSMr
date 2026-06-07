@@ -183,17 +183,27 @@ public class UndoRedoManager extends UndoManager {
      * @see CompoundEdit#end
      * @see CompoundEdit#addEdit
      */
+
+    private UndoableEdit lastProcessedEdit = null;
+
     @Override
     public boolean addEdit(UndoableEdit anEdit) {
         if (undoOrRedoInProgress) {
             anEdit.die();
             return true;
         }
+
+        if (anEdit == lastProcessedEdit) {
+            return true;
+        }
+        lastProcessedEdit = anEdit;
+
         boolean success = super.addEdit(anEdit);
         updateActions();
         if (success && anEdit.isSignificant() && editToBeUndone() == anEdit) {
             setHasSignificantEdits(true);
         }
+        
         return success;
     }
 

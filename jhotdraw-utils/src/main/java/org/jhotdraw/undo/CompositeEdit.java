@@ -114,7 +114,7 @@ public class CompositeEdit extends CompoundEdit {
     @Override
     public String getUndoPresentationName() {
         String undoLabel = UndoRedoManager.getLabels().getString("edit.undo.text");
-        return undoLabel + " " + presentationName;
+        return undoLabel + " " + getPresentationName();
     }
 
     /**
@@ -127,7 +127,7 @@ public class CompositeEdit extends CompoundEdit {
     @Override
     public String getRedoPresentationName() {
         String redoLabel = UndoRedoManager.getLabels().getString("edit.redo.text");
-        return redoLabel + " " + presentationName;
+        return redoLabel + " " + getPresentationName();
     }
 
     /**
