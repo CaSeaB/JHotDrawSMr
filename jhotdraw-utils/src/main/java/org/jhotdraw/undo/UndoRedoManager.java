@@ -196,7 +196,10 @@ public class UndoRedoManager extends UndoManager {
             return true;
         }
 
-        lastProcessedEdit = anEdit;
+        if (!edits.isEmpty()) {
+            UndoableEdit lastRegisteredEdit = edits.lastElement();
+            assert !edits.isEmpty() && lastRegisteredEdit != anEdit : "Duplicate edit reference detected in history stack!";
+        }
 
         boolean success = super.addEdit(anEdit);
         updateActions();
