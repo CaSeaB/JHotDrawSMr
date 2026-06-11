@@ -87,13 +87,7 @@ public class SVGApplicationModel extends DefaultApplicationModel {
         }
         AbstractSelectedAction action;
         ActionMap m = view.getActionMap();
-        m.put(SelectSameAction.ID, new SelectSameAction(editor));
-        m.put(GroupAction.ID, new GroupAction(editor, new SVGGroupFigure()));
-        m.put(UngroupAction.ID, new UngroupAction(editor, new SVGGroupFigure()));
-        m.put(CombineAction.ID, new CombineAction(editor));
-        m.put(SplitAction.ID, new SplitAction(editor));
-        m.put(BringToFrontAction.ID, new BringToFrontAction(editor));
-        m.put(SendToBackAction.ID, new SendToBackAction(editor));
+        initDrawingActions(m, editor);
         //view.addDisposable(action);
     }
 
@@ -116,6 +110,11 @@ public class SVGApplicationModel extends DefaultApplicationModel {
         } else {
             editor = (v == null) ? null : v.getEditor();
         }
+        initDrawingActions(m, editor);
+        return m;
+    }
+
+    private static void initDrawingActions(ActionMap m, DrawingEditor editor) {
         m.put(SelectSameAction.ID, new SelectSameAction(editor));
         m.put(GroupAction.ID, new GroupAction(editor, new SVGGroupFigure()));
         m.put(UngroupAction.ID, new UngroupAction(editor, new SVGGroupFigure()));
@@ -123,7 +122,7 @@ public class SVGApplicationModel extends DefaultApplicationModel {
         m.put(SplitAction.ID, new SplitAction(editor));
         m.put(BringToFrontAction.ID, new BringToFrontAction(editor));
         m.put(SendToBackAction.ID, new SendToBackAction(editor));
-        return m;
+        m.put(InvertColorsAction.ID, new InvertColorsAction(editor));
     }
 
     /**
@@ -146,6 +145,8 @@ public class SVGApplicationModel extends DefaultApplicationModel {
                 m.add(am.get(UngroupAction.ID));
                 m.add(am.get(CombineAction.ID));
                 m.add(am.get(SplitAction.ID));
+                m.addSeparator();
+                m.add(am.get(InvertColorsAction.ID));
                 m.addSeparator();
                 m.add(am.get(BringToFrontAction.ID));
                 m.add(am.get(SendToBackAction.ID));
