@@ -11,8 +11,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
+import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -26,9 +28,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.prefs.*;
 import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import org.jhotdraw.api.app.Disposable;
@@ -113,6 +118,7 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
             // prefs is null, because we are not permitted to read preferences
         }
         initComponents();
+        installKeyboardZoomActions();
         toolsPane.setLayout(new ToolBarLayout());
         toolsPane.setBackground(new Color(0xf0f0f0));
         toolsPane.setOpaque(true);
@@ -165,6 +171,20 @@ public class SVGDrawingPanel extends JPanel implements Disposable {
             }
         });
         setEditor(new DefaultDrawingEditor());
+    }
+
+    private void installKeyboardZoomActions() {
+        ActionMap actionMap = view.getActionMap();
+        InputMap inputMap = view.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        actionMap.put(RelativeZoomAction.ZOOM_IN_ID,
+                new RelativeZoomAction(view, RelativeZoomAction.DEFAULT_ZOOM_STEP, "Zoom In"));
+        actionMap.put(RelativeZoomAction.ZOOM_OUT_ID,
+                new RelativeZoomAction(view, 1d / RelativeZoomAction.DEFAULT_ZOOM_STEP, "Zoom Out"));
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_DOWN_MASK), RelativeZoomAction.ZOOM_IN_ID);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_EQUALS, InputEvent.CTRL_DOWN_MASK), RelativeZoomAction.ZOOM_IN_ID);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ADD, InputEvent.CTRL_DOWN_MASK), RelativeZoomAction.ZOOM_IN_ID);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK), RelativeZoomAction.ZOOM_OUT_ID);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_SUBTRACT, InputEvent.CTRL_DOWN_MASK), RelativeZoomAction.ZOOM_OUT_ID);
     }
 
     @Override
