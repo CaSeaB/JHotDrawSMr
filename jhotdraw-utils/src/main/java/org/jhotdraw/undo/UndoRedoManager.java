@@ -21,11 +21,10 @@ import org.jhotdraw.util.*;
  * @author Werner Randelshofer
  * @version $Id$
  */
-public class UndoRedoManager extends UndoManager { //javax.swing.undo.UndoManager {
+public class UndoRedoManager extends UndoManager {
 
     private static final long serialVersionUID = 1L;
     protected PropertyChangeSupport propertySupport = new PropertyChangeSupport(this);
-    private static final boolean DEBUG = false;
     /**
      * The resource bundle used for internationalisation.
      */
@@ -83,8 +82,7 @@ public class UndoRedoManager extends UndoManager { //javax.swing.undo.UndoManage
             try {
                 undo();
             } catch (CannotUndoException e) {
-                System.err.println("Cannot undo: " + e);
-                e.printStackTrace();
+                throw new IllegalStateException("Failed to execute undo operation", e);
             }
         }
     }
@@ -185,20 +183,30 @@ public class UndoRedoManager extends UndoManager { //javax.swing.undo.UndoManage
      * @see CompoundEdit#end
      * @see CompoundEdit#addEdit
      */
+
     @Override
     public boolean addEdit(UndoableEdit anEdit) {
-        if (DEBUG) {
-            System.out.println("UndoRedoManager@" + hashCode() + ".add " + anEdit);
-        }
+
         if (undoOrRedoInProgress) {
             anEdit.die();
             return true;
         }
+
+        if (!edits.isEmpty() && edits.lastElement() == anEdit){
+            return true;
+        }
+
+        if (!edits.isEmpty()) {
+            UndoableEdit lastRegisteredEdit = edits.lastElement();
+            assert !edits.isEmpty() && lastRegisteredEdit != anEdit : "Duplicate edit reference detected in history stack!";
+        }
+
         boolean success = super.addEdit(anEdit);
         updateActions();
         if (success && anEdit.isSignificant() && editToBeUndone() == anEdit) {
             setHasSignificantEdits(true);
         }
+        
         return success;
     }
 
@@ -222,11 +230,6 @@ public class UndoRedoManager extends UndoManager { //javax.swing.undo.UndoManage
      */
     private void updateActions() {
         String label;
-        if (DEBUG) {
-            System.out.println("UndoRedoManager@" + hashCode() + ".updateActions "
-                    + editToBeUndone()
-                    + " canUndo=" + canUndo() + " canRedo=" + canRedo());
-        }
         if (canUndo()) {
             undoAction.setEnabled(true);
             label = getUndoPresentationName();

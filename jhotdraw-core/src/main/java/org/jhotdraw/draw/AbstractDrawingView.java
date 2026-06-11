@@ -944,12 +944,24 @@ public abstract class AbstractDrawingView implements DrawingView, EditableCompon
         }
         // Get z-indices of deleted figures
         final int[] deletedFigureIndices = new int[deletedFigures.size()];
-        for (int i = 0; i
-                < deletedFigureIndices.length; i++) {
+        for (int i = 0; i < deletedFigureIndices.length; i++) {
             deletedFigureIndices[i] = drawing.indexOf(deletedFigures.get(i));
         }
         clearSelection();
         drawing.removeAll(deletedFigures);
+        
+        // Extracted: Create and fire the undoable edit for figure deletion
+        fireDeleteUndoableEdit(deletedFigures, deletedFigureIndices);
+    }
+
+    /**
+     * Creates and fires an undoable edit for figure deletion.
+     * Encapsulates the undo/redo logic so delete() focuses on deletion logic.
+     *
+     * @param deletedFigures the figures that were deleted
+     * @param deletedFigureIndices the original z-indices of deleted figures
+     */
+    protected void fireDeleteUndoableEdit(final List<Figure> deletedFigures, final int[] deletedFigureIndices) {
         drawing.fireUndoableEditHappened(new AbstractUndoableEdit() {
             private static final long serialVersionUID = 1L;
 
@@ -964,8 +976,7 @@ public abstract class AbstractDrawingView implements DrawingView, EditableCompon
                 super.undo();
                 clearSelection();
                 Drawing d = drawing;
-                for (int i = 0; i
-                        < deletedFigureIndices.length; i++) {
+                for (int i = 0; i < deletedFigureIndices.length; i++) {
                     d.add(deletedFigureIndices[i], deletedFigures.get(i));
                 }
                 addToSelection(deletedFigures);
@@ -974,8 +985,7 @@ public abstract class AbstractDrawingView implements DrawingView, EditableCompon
             @Override
             public void redo() throws CannotRedoException {
                 super.redo();
-                for (int i = 0; i
-                        < deletedFigureIndices.length; i++) {
+                for (int i = 0; i < deletedFigureIndices.length; i++) {
                     drawing.remove(deletedFigures.get(i));
                 }
             }
@@ -1001,6 +1011,18 @@ public abstract class AbstractDrawingView implements DrawingView, EditableCompon
             f.remap(originalToDuplicateMap, false);
         }
         addToSelection(duplicates);
+        
+        // Extracted: Create and fire the undoable edit for figure duplication
+        fireDuplicateUndoableEdit(duplicates);
+    }
+
+    /**
+     * Creates and fires an undoable edit for figure duplication.
+     * Encapsulates the undo/redo logic so duplicate() focuses on duplication logic.
+     *
+     * @param duplicates the figures that were duplicated
+     */
+    protected void fireDuplicateUndoableEdit(final ArrayList<Figure> duplicates) {
         drawing.fireUndoableEditHappened(new AbstractUndoableEdit() {
             private static final long serialVersionUID = 1L;
 
